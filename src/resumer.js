@@ -43,7 +43,7 @@ function think() {
             videoElement.getAttribute('data-video-resumer-probed') != 'true' &&
             videoElement.currentTime < 10) {
             chrome.storage.local.get("videos", function (data) {
-                const resumeTime = data?.["videos"]?.[url]?.[videoIndex] ?? undefined;
+                const resumeTime = data?.videos?.[url]?.[videoIndex] ?? undefined;
                 log('resumeTime', resumeTime);
                 if (resumeTime > 0) {
                     log('resuming', resumeTime);
