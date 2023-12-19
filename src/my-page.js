@@ -2,17 +2,16 @@
 // 
 function updateList() {
   chrome.storage.local.get("videos", function (result) {
-    console.log("1");
     let videos = result.videos;
-    if (!videos) {
-      videos = [
-        {
-          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    if (!videos || Object.keys(videos).length == 0) {
+      videos = {
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ": {
           "title": "PSY - GANGNAM STYLE(강남스타일) M/V",
-          "0": "0"
+          "date_updated": 1633131480000,
+          "0": 1.23
         }
-      ];
-    }
+      };
+    };
     let videolist = document.getElementById("videolist");
     while (videolist.lastChild) {
       videolist.removeChild(videolist.lastChild);
@@ -26,14 +25,22 @@ function updateList() {
     for (let i = 0; i < urls.length; ++i) {
       let url = urls[i];
       let video = videos[url];
-      let li = document.createElement("li");
-      let a = document.createElement("a");
-      a.href = url;
-      let dateString = new Date(video.date_updated).toISOString();
-      a.innerText = video.title + ": " + video[0] + " (" + dateString + ")";
-      li.appendChild(a);
-      videolist.appendChild(li);
-    }
+      Object.keys(video).forEach((key) => {
+        if (key == "title" || key == "date_updated") {
+          return;
+        }
+        let li = document.createElement("li");
+        let a = document.createElement("a");
+        a.href = url;
+        let seconds = video[key];
+        // seconds to hh:mm:ss
+        let timeString = new Date(seconds * 1000).toISOString().substr(11, 8);
+        let dateString = new Date(video.date_updated).toISOString();
+        a.innerText = video.title + ": " + timeString + " (" + dateString + ")";
+        li.appendChild(a);
+        videolist.appendChild(li);
+      });
+    };
   });
 };
 updateList();

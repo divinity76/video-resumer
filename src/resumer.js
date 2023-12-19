@@ -6,12 +6,13 @@ function log() {
     }
 }
 function storeVideoData(videoElement, videoIndex) {
-    let url = window.location.href;
+    const url = window.location.href;
     chrome.storage.local.get("videos", function (data) {
         data = data["videos"] ?? {};
         if ((videoElement.duration - videoElement.currentTime) < 10) {
             // video is almost done, delete resume time
             delete data[url]?.[videoIndex];
+            // 2= title+date_updated
             if (Object.keys(data[url] ?? {}).length == 2) {
                 // no more videos left, delete url
                 delete data[url];
@@ -21,12 +22,11 @@ function storeVideoData(videoElement, videoIndex) {
             data[url]["title"] = document.title;
             data[url]["date_updated"] = Date.now();
             data[url][videoIndex] = videoElement.currentTime;
-            chrome.storage.local.set({ "videos": data }).then(() => {
-                log('saved', data);
-            });
         }
+        chrome.storage.local.set({ "videos": data }).then(() => {
+            log('saved', data);
+        });
     });
-    return;
 }
 function think() {
     log('thinking');
@@ -35,7 +35,7 @@ function think() {
     }
     const url = window.location.href;
     [...document.getElementsByTagName('video')].forEach((videoElement, videoIndex) => {
-        // skip if total duration is less than 10 seconds
+        // ignore short videos
         if (videoElement.duration < 10) {
             return;
         }
@@ -43,7 +43,7 @@ function think() {
             videoElement.getAttribute('data-video-resumer-probed') != 'true' &&
             videoElement.currentTime < 10) {
             chrome.storage.local.get("videos", function (data) {
-                let resumeTime = data?.["videos"]?.[url]?.[videoIndex] || undefined;
+                const resumeTime = data?.["videos"]?.[url]?.[videoIndex] ?? undefined;
                 log('resumeTime', resumeTime);
                 if (resumeTime > 0) {
                     log('resuming', resumeTime);
@@ -54,7 +54,8 @@ function think() {
         }
         if (videoElement.currentTime < 10) {
             // on Firefox Android, currentTime randomly reset to 0 after switching tabs
-            // javascript still runs but .currentTime is 0 o.0
+            // javascript setInterval() still runs but .currentTime is 0 o.0
+            // regardless, no need to save <10s progress
             return;
         }
         storeVideoData(videoElement, videoIndex);
