@@ -39,11 +39,6 @@ function think() {
         if (videoElement.duration < 10) {
             return;
         }
-        if (videoElement.currentTime < 10) {
-            // on Firefox Android, currentTime randomly reset to 0 after switching tabs
-            // javascript still runs but .currentTime is 0 o.0
-            return;
-        }
         if (
             videoElement.getAttribute('data-video-resumer-probed') != 'true' &&
             videoElement.currentTime < 10) {
@@ -56,6 +51,11 @@ function think() {
                 }
             });
             videoElement.setAttribute('data-video-resumer-probed', 'true');
+        }
+        if (videoElement.currentTime < 10) {
+            // on Firefox Android, currentTime randomly reset to 0 after switching tabs
+            // javascript still runs but .currentTime is 0 o.0
+            return;
         }
         storeVideoData(videoElement, videoIndex);
     });
