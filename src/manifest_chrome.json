@@ -2,7 +2,7 @@
   "description": "video resumer",
   "manifest_version": 3,
   "name": "video resumer",
-  "version": "1.0.3",
+  "version": "1.1.1",
   "homepage_url": "https://github.com/divinity76/video-resumer",
   "icons": {
     "48": "icons/page-48.png"
